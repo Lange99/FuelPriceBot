@@ -1,8 +1,7 @@
-use std::collections::HashMap;
+
+use crate::response::{location, response_struct, station};
 use chrono::{DateTime, Utc};
-use crate::response::{station, location, response_struct};
-
-
+use std::{borrow::BorrowMut, collections::HashMap, vec};
 
 // this struct is a "wrapper" struct around station struct.
 // i saved in this struct the distance between the station and the user and the price of the fuel for the user.
@@ -45,7 +44,12 @@ fn calculate_distance_between_points(lat1: f64, lng1: f64, lat2: f64, lng2: f64)
 /// this function will return a vector of station_utility objects
 /// first the function will calculate the distance between the fist location and all the stations
 /// then it will calculate the price for the fuel type and return a vector of station_utility objects
-fn setup_data(response: response_struct, max_distance: f64, id_fuel: i16, userlocation:Vec<HashMap<String, f64>>) -> Vec<station_utility> {
+pub fn setup_data(
+    response: response_struct,
+    max_distance: f64,
+    id_fuel: i16,
+    userlocation: Vec<HashMap<String, f64>>,
+) -> Vec<station_utility> {
     let mut stations: Vec<station_utility> = Vec::new();
     let updated_station = delete_not_updated_stations(response);
     for station in &updated_station {
@@ -72,7 +76,7 @@ pub fn get_best_stations(
     response: response_struct,
     max_distance: f64,
     id_fuel: i16,
-    userlocation:Vec<HashMap<String, f64>>,
+    userlocation: Vec<HashMap<String, f64>>,
 ) -> Vec<station> {
     let mut stations = setup_data(response, max_distance, id_fuel, userlocation);
     stations.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap()); //sort by price
@@ -94,4 +98,18 @@ fn delete_not_updated_stations(response: response_struct) -> Vec<station> {
         }
     }
     stations
+}
+
+pub fn get_type_fuel_inside_distance(stationList:Vec<station_utility>) -> HashMap<i64, String> {
+    let mut type_fuel: HashMap<i64, String> = HashMap::new();
+    for station in &stationList {
+        for fuel in &station.station.fuels {
+            if type_fuel.contains_key(&fuel.id) {
+                continue;
+            } else {
+                type_fuel.insert(fuel.id, fuel.name.clone());
+            }
+        }
+    }
+    type_fuel
 }

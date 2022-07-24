@@ -1,11 +1,11 @@
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 pub struct fuel{
-    id: i64,
-    price: f64,
-    name: String,
-    fuelId: i16,
-    isSelf: bool,
+    pub id: i64,
+    pub price: f64,
+    pub name: String,
+    pub fuelId: i16,
+    pub isSelf: bool,
 }
 #[derive(serde::Serialize, serde::Deserialize, Debug,Clone)]
 pub struct location{
