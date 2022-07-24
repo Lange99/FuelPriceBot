@@ -25,7 +25,7 @@ pub struct station{
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct response_struct{
-    success: bool,
+    pub success: bool,
     pub center: location,
     pub results: Vec<station>
 }

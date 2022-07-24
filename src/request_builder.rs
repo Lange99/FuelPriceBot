@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use reqwest::header::HeaderMap;
 
-
-pub use response::response_struct;
-
+use crate::response::{location, response_struct, station};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 
@@ -14,7 +12,6 @@ pub struct json_to_pass {
     fuelType: String,
     priceOrder: String,
 }
-
 
 impl json_to_pass {
     pub fn new(
@@ -30,13 +27,35 @@ impl json_to_pass {
     }
 }
 
-pub async fn request(url: &str, headers: HeaderMap,points: Vec<HashMap<String, f64>>,
-    fuelType: String,
-    priceOrder: String) -> response_struct {
+pub async fn request(
+    points: Vec<HashMap<String, f64>>,
+) -> response_struct {
+
     let client = reqwest::Client::new();
-    let payload = json_to_pass::new(points, fuelType, priceOrder);
+
+    //setup the request
+    const REQUEST_URL: &str = "https://carburanti.mise.gov.it/ospzApi/search/zone";
+    const REQUEST_HOST: &str = "carburanti.mise.gov.it";
+    const REQUEST_ACCEPT: &str = "application/json";
+    const REQUEST_CONTENT_TYPE: &str = "application/json";
+    const REQUEST_ORIGIN: &str = "https://carburanti.mise.gov.it";
+    const REQUEST_REFERER: &str = "https://carburanti.mise.gov.it/ospzSearch/zona";
+
+    let mut headers = HeaderMap::new();
+    headers.insert("host", REQUEST_HOST.parse().unwrap());
+    headers.insert("accept", REQUEST_ACCEPT.parse().unwrap());
+    headers.insert("content-type", REQUEST_CONTENT_TYPE.parse().unwrap());
+    headers.insert("origin", REQUEST_ORIGIN.parse().unwrap());
+    headers.insert("referer", REQUEST_REFERER.parse().unwrap());
+   
+    //setup the payload
+    // the fuel type is default 1 because the api return me 
+    // always all the the types of fuel available in the station
+    let fuelType: String = 1.to_string();
+    let priceOrder: String = "asc".to_string();
+    let payload = json_to_pass::new(points,fuelType, priceOrder);
     let res = client
-        .post(url)
+        .post(REQUEST_URL)
         .headers(headers)
         .json(&payload)
         .send()
@@ -54,6 +73,3 @@ pub async fn request(url: &str, headers: HeaderMap,points: Vec<HashMap<String, f
         }
     }
 }
-
-
-

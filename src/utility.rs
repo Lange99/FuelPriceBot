@@ -1,4 +1,3 @@
-
 use crate::response::{location, response_struct, station};
 use chrono::{DateTime, Utc};
 use std::{borrow::BorrowMut, collections::HashMap, vec};
@@ -44,7 +43,7 @@ fn calculate_distance_between_points(lat1: f64, lng1: f64, lat2: f64, lng2: f64)
 /// this function will return a vector of station_utility objects
 /// first the function will calculate the distance between the fist location and all the stations
 /// then it will calculate the price for the fuel type and return a vector of station_utility objects
-pub fn setup_data(
+fn setup_data(
     response: response_struct,
     max_distance: f64,
     id_fuel: i16,
@@ -71,20 +70,16 @@ pub fn setup_data(
 /// * `id_fuel` - the id of the fuel type
 /// * `userlocation` - the location of the user
 /// # Returns
-/// * `Vec<station>` - the vector of station objects sorted by the price of the fuel type
+/// * 'String' - a formatted string with the stations near the fist location
 pub fn get_best_stations(
     response: response_struct,
     max_distance: f64,
     id_fuel: i16,
     userlocation: Vec<HashMap<String, f64>>,
-) -> Vec<station> {
+) -> String {
     let mut stations = setup_data(response, max_distance, id_fuel, userlocation);
     stations.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap()); //sort by price
-    let mut best_stations: Vec<station> = Vec::new();
-    for station in &stations {
-        best_stations.push(station.station.clone());
-    }
-    best_stations
+    return print_best_stations_info(stations);
 }
 
 fn delete_not_updated_stations(response: response_struct) -> Vec<station> {
@@ -99,17 +94,61 @@ fn delete_not_updated_stations(response: response_struct) -> Vec<station> {
     }
     stations
 }
-
-pub fn get_type_fuel_inside_distance(stationList:Vec<station_utility>) -> HashMap<i64, String> {
-    let mut type_fuel: HashMap<i64, String> = HashMap::new();
-    for station in &stationList {
-        for fuel in &station.station.fuels {
-            if type_fuel.contains_key(&fuel.id) {
-                continue;
-            } else {
-                type_fuel.insert(fuel.id, fuel.name.clone());
+/// This method will return a string with the avaible fuel types for the stations near the fist location
+/// # Arguments
+/// * 'response' - the response from the api
+/// * 'max_distance' - the max distance from the fist location
+/// * 'first_location' - the fist location of the user
+/// 
+/// # Returns
+/// * 'String' - a formatted string with the avaible fuel types for the stations near the fist location
+/// 
+pub fn get_type_fuel_inside_distance(
+    response: response_struct,
+    max_distance: f64,
+    first_location: Vec<HashMap<std::string::String, f64>>,
+) -> String {
+    let mut type_fuel: HashMap<i16, String> = HashMap::new();
+    for station in &response.results {
+        let distance: f64 = calculate_distance(&first_location, station.clone());
+        if distance <= max_distance {
+            for fuel in &station.fuels {
+                let id_fuel: i16 = fuel.fuelId.clone();
+                let fuel_type: String = fuel.name.clone();
+                type_fuel.insert(id_fuel, fuel_type);
             }
         }
     }
-    type_fuel
+    string_of_type_fuel(type_fuel)
+}
+
+fn string_of_type_fuel(type_fuel: HashMap<i16, String>) -> String {
+    let mut string_type_fuel: String = String::new();
+    for (id, name) in type_fuel {
+        string_type_fuel.push_str(&format!("{} - {} | \n", id, name));
+    }
+    string_type_fuel
+}
+
+fn print_best_stations_info(best_stations: Vec<station_utility>) -> String {
+    let mut final_string = String::new();
+    let mut counter = 0;
+    for station in &best_stations {
+        let mut temp = String::new();
+        counter += 1;
+        temp.push_str(&format!("{}", counter));
+        temp.push_str("-> || ");
+        temp.push_str("NAME: ");
+        temp.push_str(&format!("{}", station.station.name));
+        temp.push_str("; || ADDRESS: ");
+        temp.push_str(&format!("{}", station.station.address));
+        temp.push_str("; || DISTANCE: ");
+        temp.push_str(&format!("{:.3} km", station.distance));
+        temp.push_str("; || PRICE: ");
+        temp.push_str(&format!("{}€", station.price));
+        temp.push_str(" | ");
+        final_string.push_str(&temp);
+    }
+
+    final_string
 }

@@ -1,15 +1,15 @@
 use std::collections::HashMap;
 use std::fmt::format;
-use std::{future, env};
 use std::hash::Hash;
+use std::{env, future};
 
 use futures::executor::block_on;
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::{Client, Error, Response};
 
-
+pub mod request_builder;
 pub mod response;
-pub use utility::{get_best_stations};
+pub use utility::get_best_stations;
 pub mod utility;
 use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
@@ -20,13 +20,11 @@ type HandlerResult = Result<(), Box<dyn std::error::Error + Send + Sync>>;
 pub mod telegram_handler;
 pub use telegram_handler::conversation_handler;
 
-
-
 /* TODO:
 * INTERFACCIA TELEGRAM
  */
 
- #[tokio::main]
+#[tokio::main]
 async fn main() {
     /// URL
     const REQUEST_URL: &str = "https://carburanti.mise.gov.it/ospzApi/search/zone";
@@ -50,30 +48,26 @@ async fn main() {
     log::info!("Starting dialogue bot...");
 
     //telegram handler
-    telegram_handler::conversation_handler(REQUEST_URL, headers ).await;
-
-    
+    loop {
+        telegram_handler::conversation_handler().await;
+    }
 }
 
+/*
+let mut hashCoo = HashMap::new();
+hashCoo.insert("lat".into(), lat);
+hashCoo.insert("lng".into(), lng);
+
+let position_vec = vec![hashCoo];
+let position_vec_clone = position_vec.clone();
 
 
+let payload = json_to_pass::new(position_vec, fuelType, priceOrder);
 
-
-    /*
-    let mut hashCoo = HashMap::new();
-    hashCoo.insert("lat".into(), lat);
-    hashCoo.insert("lng".into(), lng);
-
-    let position_vec = vec![hashCoo];
-    let position_vec_clone = position_vec.clone();
-
-
-    let payload = json_to_pass::new(position_vec, fuelType, priceOrder);
-
-    //need tokio runtime
-    let rt = tokio::runtime::Builder::new_current_thread()
-        .enable_io()
-        .enable_time()
-        .build()
-        .unwrap();
-    let response = rt.block_on(request(REQUEST_URL, headers, payload)); */
+//need tokio runtime
+let rt = tokio::runtime::Builder::new_current_thread()
+    .enable_io()
+    .enable_time()
+    .build()
+    .unwrap();
+let response = rt.block_on(request(REQUEST_URL, headers, payload)); */
