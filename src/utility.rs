@@ -99,10 +99,10 @@ fn delete_not_updated_stations(response: response_struct) -> Vec<station> {
 /// * 'response' - the response from the api
 /// * 'max_distance' - the max distance from the fist location
 /// * 'first_location' - the fist location of the user
-/// 
+///
 /// # Returns
 /// * 'String' - a formatted string with the avaible fuel types for the stations near the fist location
-/// 
+///
 pub fn get_type_fuel_inside_distance(
     response: response_struct,
     max_distance: f64,
@@ -142,7 +142,12 @@ fn print_best_stations_info(best_stations: Vec<station_utility>) -> String {
         temp.push_str(&format!("{}", station.station.name));
         temp.push_str("; || ADDRESS: ");
         temp.push_str(&format!("{}", station.station.address));
-        temp.push_str("; || DISTANCE: ");
+        temp.push_str("; || MAPS URL: ");
+        temp.push_str(&format!(
+            "https://www.google.com/maps/search/?api=1&query={}%2C{}",
+            station.station.location.lat, station.station.location.lng
+        ));
+        temp.push_str(" ; || DISTANCE: ");
         temp.push_str(&format!("{:.3} km", station.distance));
         temp.push_str("; || PRICE: ");
         temp.push_str(&format!("{}€", station.price));
