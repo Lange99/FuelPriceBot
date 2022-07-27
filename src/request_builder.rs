@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use reqwest::header::HeaderMap;
 
-use crate::response::{location, response_struct, station};
+use crate::response::{response_struct};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 

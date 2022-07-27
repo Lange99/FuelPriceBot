@@ -1,7 +1,7 @@
-use crate::request_builder::{self, request};
+use crate::request_builder::{request};
 use crate::response::{self, response_struct};
-use crate::utility::{self, get_best_stations, get_type_fuel_inside_distance};
-use std::borrow::BorrowMut;
+use crate::utility::{get_best_stations, get_type_fuel_inside_distance};
+
 use std::collections::HashMap;
 use std::env;
 /**

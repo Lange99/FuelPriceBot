@@ -41,7 +41,7 @@ impl station{
     }
 
     pub fn parse_date(&self) -> String{
-        let mut date = self.insertDate.clone();
+        let date = self.insertDate.clone();
         let newdate=date.split(":").collect::<Vec<&str>>()[0].to_string();
         let returndate = newdate.split("T").collect::<Vec<&str>>()[0].to_string();
         returndate

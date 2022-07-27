@@ -1,6 +1,6 @@
-use crate::response::{location, response_struct, station};
-use chrono::{DateTime, Utc};
-use std::{borrow::BorrowMut, collections::HashMap, vec};
+use crate::response::{response_struct, station};
+use chrono::{Utc};
+use std::{collections::HashMap};
 
 // this struct is a "wrapper" struct around station struct.
 // i saved in this struct the distance between the station and the user and the price of the fuel for the user.
