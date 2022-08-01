@@ -1,11 +1,10 @@
 use std::collections::HashMap;
-
+use serde; 
 use reqwest::header::HeaderMap;
 
 use crate::response::{response_struct};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-
 /// This struct is used to create the payload of the request.
 pub struct json_to_pass {
     points: Vec<HashMap<String, f64>>,

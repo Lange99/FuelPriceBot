@@ -1,7 +1,7 @@
-use crate::request_builder::{request};
+use crate::request_builder::{self, request};
 use crate::response::{self, response_struct};
-use crate::utility::{get_best_stations, get_type_fuel_inside_distance};
-
+use crate::utility::{self, get_best_stations, get_type_fuel_inside_distance};
+use std::borrow::BorrowMut;
 use std::collections::HashMap;
 use std::env;
 /**
@@ -183,7 +183,7 @@ fn split_message(message: &str) -> Vec<String> {
 }
 
 pub async fn conversation_handler() {
-    let token = env::var("TELOXIDE_FUEL_TOKEN").expect("TELOXIDE_FUEL_TOKEN");
+    let token = env::var("TELOXIDE_FUEL_TOKEN").expect("missing: TELOXIDE_FUEL_TOKEN");
     let bot = Bot::new(token).auto_send();
     Dispatcher::builder(
         bot,
