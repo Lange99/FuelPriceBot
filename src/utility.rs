@@ -79,6 +79,15 @@ pub fn get_best_stations(
 ) -> String {
     let mut stations = setup_data(response, max_distance, id_fuel, userlocation);
     stations.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap()); //sort by price
+    let mut i =0;
+    //remove the stations with a price of 0.0
+    while i < stations.len() {
+        if stations[i].price == 0.0 {
+            stations.remove(i);
+        } else {
+            i = i+ 1;
+        }
+    }
     return print_best_stations_info(stations);
 }
 
