@@ -1,7 +1,4 @@
-FROM rust:1.49.0
-ARG TELOXIDE_FUEL_TOKEN
-ENV TELOXIDE_FUEL_TOKEN=$TELOXIDE_FUEL_TOKEN
-WORKDIR /usr/src
+FROM rust:1.63.0 as build
 COPY . .
-RUN cargo build --release
-CMD [ "rust" ]
+RUN cargo build --
+ENTRYPOINT ["/bin/sh", "-c", "./fuelPriceBot"]

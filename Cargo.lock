@@ -248,6 +248,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "fuelPriceBot"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "futures",
+ "log",
+ "pretty_env_logger",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "teloxide",
+ "tokio",
+]
+
+[[package]]
 name = "futures"
 version = "0.3.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -914,21 +929,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
-]
-
-[[package]]
-name = "rust"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "futures",
- "log",
- "pretty_env_logger",
- "reqwest",
- "serde",
- "serde_json",
- "teloxide",
- "tokio",
 ]
 
 [[package]]
