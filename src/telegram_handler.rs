@@ -101,6 +101,7 @@ pub async fn receive_max_distance(
             // request:
             let request = request(points.clone()).await;
             let response = request.clone();
+            println!("{:?}", points);
             let fuel_to_print = get_type_fuel_inside_distance(request, distance, points);
             let question = format!("Select the id of the fuel: | \n{}", fuel_to_print);
             let messages = split_message(&question);

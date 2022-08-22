@@ -1,6 +1,6 @@
 use crate::response::{response_struct, station};
-use chrono::{Utc};
-use std::{collections::HashMap};
+use chrono::Utc;
+use std::collections::HashMap;
 
 // this struct is a "wrapper" struct around station struct.
 // i saved in this struct the distance between the station and the user and the price of the fuel for the user.
@@ -20,23 +20,26 @@ impl station_utility {
     }
 }
 
-fn calculate_distance(fistlocation: &Vec<HashMap<String, f64>>, station: station) -> f64 {
-    let mut distance: f64 = 0.0;
-    for point in fistlocation {
-        let lat1: f64 = point["lat"].clone();
-        let lng1: f64 = point["lng"].clone();
-        let lat2: f64 = station.location.lat.clone();
-        let lng2: f64 = station.location.lng.clone();
-        distance += calculate_distance_between_points(lat1, lng1, lat2, lng2);
-    }
-    distance
+fn calculate_distance(firstlocation: &Vec<HashMap<String, f64>>, station: station) -> f64 {
+    let lat1: f64 = firstlocation[0]["lat"].clone();
+    let lng1: f64 = firstlocation[0]["lng"].clone();
+    let lat2: f64 = station.location.lat.clone();
+    let lng2: f64 = station.location.lng.clone();
+    calculate_distance_between_points(lat1, lng1, lat2, lng2)
 }
 fn calculate_distance_between_points(lat1: f64, lng1: f64, lat2: f64, lng2: f64) -> f64 {
     let earth_radius: f64 = 6371.0;
-    let dlat: f64 = (lat2 - lat1).to_radians();
-    let dlng: f64 = (lng2 - lng1).to_radians();
-    let a: f64 = (dlat / 2.0).sin().powi(2) + (dlng / 2.0).sin().powi(2) * lat1.cos() * lat2.cos();
-    let c: f64 = 2.0 * a.sqrt().atan2(1.0);
+    let dlat1 = lat1.to_radians();
+    let dlng1 = lng1.to_radians();
+    let dlat2 = lat2.to_radians();
+    let dlng2 = lng2.to_radians();
+
+    let dlat = dlat2 - dlat1;
+    let dlng = dlng2 - dlng1;
+
+    let a: f64 = (dlat / 2.0).sin().powi(2) + (dlng / 2.0).sin().powi(2) * dlat1.cos() * dlat2.cos();
+    let c: f64 = 2.0 * a.sqrt().asin();
+
     earth_radius * c
 }
 
@@ -55,6 +58,7 @@ fn setup_data(
         let distance: f64 = calculate_distance(&userlocation, station.clone());
         if distance <= max_distance {
             let price: f64 = station.get_price_for_fuel(id_fuel);
+            println!("{}", distance);
             stations.push(station_utility::new(station.clone(), distance, price));
         }
     }
@@ -79,13 +83,13 @@ pub fn get_best_stations(
 ) -> String {
     let mut stations = setup_data(response, max_distance, id_fuel, userlocation);
     stations.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap()); //sort by price
-    let mut i =0;
+    let mut i = 0;
     //remove the stations with a price of 0.0
     while i < stations.len() {
         if stations[i].price == 0.0 {
             stations.remove(i);
         } else {
-            i = i+ 1;
+            i = i + 1;
         }
     }
     return print_best_stations_info(stations);
@@ -122,6 +126,8 @@ pub fn get_type_fuel_inside_distance(
         let distance: f64 = calculate_distance(&first_location, station.clone());
         if distance <= max_distance {
             for fuel in &station.fuels {
+                let debug = calculate_distance(&first_location, station.clone());
+                println!("{:?}", debug);
                 let id_fuel: i16 = fuel.fuelId.clone();
                 let fuel_type: String = fuel.name.clone();
                 type_fuel.insert(id_fuel, fuel_type);
