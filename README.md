@@ -31,7 +31,7 @@ The data come from the [MISE(Ministero dello Sviluppo Economico) plattaform for 
 If you want to contribute to the project you can open a pull request or open an issue.
 
 ## Contact
-If you want to contact me you can send me an email to [christianlangellotti@gmail.com] or open an issue on the repository.
+If you want to contact me you can open an issue on the repository.
 
 ## Thanks
 Thanks to [@tambup](https://github.com/Tambup) for the help with the dockerfile
