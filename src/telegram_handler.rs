@@ -67,7 +67,7 @@ pub async fn receive_location(
         Some(location) => {
             bot.send_message(
                 msg.chat.id,
-                "how far do you want to search for distributors? (distance in km)?",
+                "how far do you want to search for distributors? (distance in km)",
             )
             .await?;
             dialogue
