@@ -57,6 +57,7 @@ fn setup_data(
     for station in &updated_station {
         let distance: f64 = calculate_distance(&userlocation, station.clone());
         if distance <= max_distance {
+
             let price: f64 = station.get_price_for_fuel(id_fuel);
             println!("{}", distance);
             stations.push(station_utility::new(station.clone(), distance, price));
@@ -99,9 +100,12 @@ fn delete_not_updated_stations(response: response_struct) -> Vec<station> {
     let mut stations: Vec<station> = Vec::new();
     let today = Utc::now();
     let today_string = today.format("%Y-%m-%d").to_string();
+    let yesterday = today - chrono::Duration::days(1);
+    let yesterday_string = yesterday.format("%Y-%m-%d").to_string();
     println!("today_string: {}", today_string);
+    println!("yesterday_string: {}", yesterday_string);
     for station in &response.results {
-        if station.parse_date() == today_string {
+        if station.parse_date() == today_string || station.parse_date() == yesterday_string {
             stations.push(station.clone());
         }
     }
