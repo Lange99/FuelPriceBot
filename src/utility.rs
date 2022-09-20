@@ -146,6 +146,8 @@ fn string_of_type_fuel(type_fuel: HashMap<i16, String>) -> String {
     for (id, name) in type_fuel {
         string_type_fuel.push_str(&format!("{} - {} | \n", id, name));
     }
+    //exit choice
+    string_type_fuel.push_str(&format!("{} - exit", 0));
     string_type_fuel
 }
 

@@ -140,10 +140,15 @@ pub async fn receive_id_fuel(
             let points = vec![points];
             let request = request.clone();
             let best_stations = get_best_stations(request, distance, id_fuel, points);
-            let final_response = format!("The best station are: | \n{}", best_stations);
-            let messages_to_send = split_message(&final_response);
-            for message in messages_to_send {
-                bot.send_message(msg.chat.id, message).await?;
+            if best_stations.len() == 0 {
+                bot.send_message(msg.chat.id, "No stations found")
+                    .await?;
+            } else {
+                let final_response = format!("The best station are: | \n{}", best_stations);
+                let messages_to_send = split_message(&final_response);
+                for message in messages_to_send {
+                    bot.send_message(msg.chat.id, message).await?;
+                }
             }
 
             dialogue.update(State::Start).await?;
