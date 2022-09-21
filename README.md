@@ -39,7 +39,9 @@ If you want to contact me you can open an issue on the repository.
 ## Thanks
 Thanks to [@tambup](https://github.com/Tambup) for the help with the dockerfile
 
-## DON'T BE A DICK PUBLIC LICENSE
+## Licence
+
+### DON'T BE A DICK PUBLIC LICENSE
 
 > Version 1.1, December 2016
 
