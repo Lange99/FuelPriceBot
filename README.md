@@ -12,7 +12,8 @@ A telegram bot that can search near your position the best fuel station in italy
 
 ### Docker
 - clone the repository
-- run the commend `docker run -e TELOXIDE_FUEL_TOKEN=XXXX -v absolute_local_path:absolute_docker_path tag
+- build the docker
+- run the commend `docker run -e TELOXIDE_FUEL_TOKEN=XXXX`
 
 # Usage
 - send a random message to the bot to start the conversation
