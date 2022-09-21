@@ -12,7 +12,7 @@ A telegram bot that can search near your position the best fuel station in italy
 
 ### Docker
 - clone the repository
-- run the commend `docker run -e TELOXIDE_FUEL_TOKEN=<your token> -v absolute_local_path:absolute_docker_path tag
+- run the commend `docker run -e TELOXIDE_FUEL_TOKEN=XXXX -v absolute_local_path:absolute_docker_path tag
 
 # Usage
 - send a random message to the bot to start the conversation
@@ -26,6 +26,9 @@ A telegram bot that can search near your position the best fuel station in italy
 
 # Where the data come from
 The data come from the [MISE(Ministero dello Sviluppo Economico) plattaform for the fuel price](https://carburanti.mise.gov.it/)
+
+# Try me 
+You can try the bot by searching @langePriceFuelBot or at this [link](https://t.me/langePriceFuelBot)
 
 ## Contributing
 If you want to contribute to the project you can open a pull request or open an issue.
