@@ -1,7 +1,6 @@
 use crate::request_builder::{self, request};
 use crate::response::{self, response_struct};
-use crate::utility::{self, get_best_stations, get_type_fuel_inside_distance};
-use std::borrow::BorrowMut;
+use crate::utility::{self, get_best_stations, get_fuel_type};
 use std::collections::HashMap;
 use std::env;
 /**
@@ -52,6 +51,7 @@ impl Default for State {
 }
 
 pub async fn start(bot: AutoSend<Bot>, msg: Message, dialogue: MyDialogue) -> HandlerResult {
+    
     bot.send_message(msg.chat.id, "Welcome to Fuel Bot!\nSend me your position ")
         .await?;
     dialogue.update(State::ReceiveLocation).await?;
@@ -67,7 +67,7 @@ pub async fn receive_location(
         Some(location) => {
             bot.send_message(
                 msg.chat.id,
-                "how far do you want to search for distributors? (distance in km)",
+                "how far do you want to search for distributors? (distance in km, MAX 10 km)",
             )
             .await?;
             dialogue
@@ -93,16 +93,22 @@ pub async fn receive_max_distance(
 ) -> HandlerResult {
     match msg.text().map(|text| text.parse::<f64>()) {
         Some(Ok(distance)) => {
+            if distance > 10.0 {
+                bot.send_message(msg.chat.id, "Max distance is 10 km")
+                    .await?;
+                return Ok(());
+            }
             let mut points: HashMap<String, f64> = HashMap::new();
             points.insert("lat".to_string(), user_location.latitude);
             points.insert("lng".to_string(), user_location.longitude);
             let points = vec![points];
 
             // request:
-            let request = request(points.clone()).await;
+            let request = request(points.clone(), distance).await;
             let response = request.clone();
             println!("{:?}", points);
-            let fuel_to_print = get_type_fuel_inside_distance(request, distance, points);
+
+            let fuel_to_print = get_fuel_type(request);
             let question = format!("Select the id of the fuel: | \n{}", fuel_to_print);
             let messages = split_message(&question);
             for message in messages {
@@ -118,7 +124,7 @@ pub async fn receive_max_distance(
                 .expect("Error updating state");
         }
         _ => {
-            bot.send_message(msg.chat.id, "Send me the distance")
+            bot.send_message(msg.chat.id, "Send me the distance, max 10 km")
                 .await?;
         }
     }

@@ -32,12 +32,20 @@ pub struct response_struct{
 
 impl station{
     pub fn get_price_for_fuel(&self, fuel_id: i16) -> f64{
+        let mut prices: Vec<f64> = Vec::new();
         for fuel in &self.fuels{
             if fuel.fuelId == fuel_id{
-                return fuel.price;
+                prices.push(fuel.price);
             }
         }
-        0.0
+        if prices.len() == 0{
+            return 0.0;
+        } else {
+            //sort the vector
+            prices.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            //return the lowest price
+            return prices[0];
+        }
     }
 
     pub fn parse_date(&self) -> String{

@@ -37,7 +37,8 @@ fn calculate_distance_between_points(lat1: f64, lng1: f64, lat2: f64, lng2: f64)
     let dlat = dlat2 - dlat1;
     let dlng = dlng2 - dlng1;
 
-    let a: f64 = (dlat / 2.0).sin().powi(2) + (dlng / 2.0).sin().powi(2) * dlat1.cos() * dlat2.cos();
+    let a: f64 =
+        (dlat / 2.0).sin().powi(2) + (dlng / 2.0).sin().powi(2) * dlat1.cos() * dlat2.cos();
     let c: f64 = 2.0 * a.sqrt().asin();
 
     earth_radius * c
@@ -53,15 +54,14 @@ fn setup_data(
     userlocation: Vec<HashMap<String, f64>>,
 ) -> Vec<station_utility> {
     let mut stations: Vec<station_utility> = Vec::new();
+    print!("{}", response.results.len().to_string());
     let updated_station = delete_not_updated_stations(response);
     for station in &updated_station {
         let distance: f64 = calculate_distance(&userlocation, station.clone());
-        if distance <= max_distance {
 
-            let price: f64 = station.get_price_for_fuel(id_fuel);
-            println!("{}", distance);
-            stations.push(station_utility::new(station.clone(), distance, price));
-        }
+        let price: f64 = station.get_price_for_fuel(id_fuel);
+        //println!("{}", distance);
+        stations.push(station_utility::new(station.clone(), distance, price));
     }
     stations
 }
@@ -84,16 +84,20 @@ pub fn get_best_stations(
 ) -> String {
     let mut stations = setup_data(response, max_distance, id_fuel, userlocation);
     stations.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap()); //sort by price
+    let mut sum_price: f64 = 0.0;
+    let average_price: f64;
     let mut i = 0;
     //remove the stations with a price of 0.0
     while i < stations.len() {
         if stations[i].price == 0.0 {
             stations.remove(i);
         } else {
+            sum_price = sum_price + stations[i].price;
             i = i + 1;
         }
     }
-    return print_best_stations_info(stations);
+    average_price = sum_price / stations.len() as f64;
+    return print_best_stations_info(stations, average_price);
 }
 
 fn delete_not_updated_stations(response: response_struct) -> Vec<station> {
@@ -111,31 +115,23 @@ fn delete_not_updated_stations(response: response_struct) -> Vec<station> {
     }
     stations
 }
-/// This method will return a string with the avaible fuel types for the stations near the fist location
+/// This method will return a string with the avaible fuel types for the stations 
 /// # Arguments
 /// * 'response' - the response from the api
-/// * 'max_distance' - the max distance from the fist location
-/// * 'first_location' - the fist location of the user
 ///
 /// # Returns
 /// * 'String' - a formatted string with the avaible fuel types for the stations near the fist location
 ///
-pub fn get_type_fuel_inside_distance(
+pub fn get_fuel_type(
     response: response_struct,
-    max_distance: f64,
-    first_location: Vec<HashMap<std::string::String, f64>>,
 ) -> String {
     let mut type_fuel: HashMap<i16, String> = HashMap::new();
+    println!("{} stations", response.results.len());
     for station in &response.results {
-        let distance: f64 = calculate_distance(&first_location, station.clone());
-        if distance <= max_distance {
-            for fuel in &station.fuels {
-                let debug = calculate_distance(&first_location, station.clone());
-                println!("{:?}", debug);
-                let id_fuel: i16 = fuel.fuelId.clone();
-                let fuel_type: String = fuel.name.clone();
-                type_fuel.insert(id_fuel, fuel_type);
-            }
+        for fuel in &station.fuels {
+            let id_fuel: i16 = fuel.fuelId.clone();
+            let fuel_type: String = fuel.name.clone();
+            type_fuel.insert(id_fuel, fuel_type);
         }
     }
     string_of_type_fuel(type_fuel)
@@ -143,26 +139,29 @@ pub fn get_type_fuel_inside_distance(
 
 fn string_of_type_fuel(type_fuel: HashMap<i16, String>) -> String {
     let mut string_type_fuel: String = String::new();
-    for (id, name) in type_fuel {
+    string_type_fuel.push_str(&format!("{} - exit | \n", 0));
+    let mut vec: Vec<(&i16, &String)> = type_fuel.iter().collect();
+    vec.sort_by_key(|k| *k.0);
+
+    for (id, name) in vec {
         string_type_fuel.push_str(&format!("{} - {} | \n", id, name));
     }
-    //exit choice
-    string_type_fuel.push_str(&format!("{} - exit", 0));
     string_type_fuel
 }
 
-fn print_best_stations_info(best_stations: Vec<station_utility>) -> String {
+fn print_best_stations_info(best_stations: Vec<station_utility>, avg: f64) -> String {
     let mut final_string = String::new();
     let mut counter = 0;
+    final_string.push_str(&format!(" | AVERAGE PRICE: {:.3} | ", avg));
     for station in &best_stations {
         let mut temp = String::new();
         counter += 1;
         temp.push_str(&format!("{}", counter));
         temp.push_str("-> || ");
         temp.push_str("NAME: ");
-        temp.push_str(&format!("{}", station.station.name));
+        temp.push_str(&format!("{}", station.station.name.to_lowercase()));
         temp.push_str("; || ADDRESS: ");
-        temp.push_str(&format!("{}", station.station.address));
+        temp.push_str(&format!("{}", station.station.address.to_lowercase()));
         temp.push_str("; || MAPS URL: ");
         temp.push_str(&format!(
             "https://www.google.com/maps/search/?api=1&query={}%2C{}",

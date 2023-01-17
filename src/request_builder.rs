@@ -10,6 +10,7 @@ pub struct json_to_pass {
     points: Vec<HashMap<String, f64>>,
     fuelType: String,
     priceOrder: String,
+    radius: String,
 }
 
 impl json_to_pass {
@@ -17,17 +18,20 @@ impl json_to_pass {
         points: Vec<HashMap<String, f64>>,
         fuelType: String,
         priceOrder: String,
+        radius: String,
     ) -> json_to_pass {
         json_to_pass {
             points,
             fuelType,
             priceOrder,
+            radius,
         }
     }
 }
 
 pub async fn request(
     points: Vec<HashMap<String, f64>>,
+    distance: f64,
 ) -> response_struct {
 
     let client = reqwest::Client::new();
@@ -50,9 +54,11 @@ pub async fn request(
     //setup the payload
     // the fuel type is default 1 because the api return me 
     // always all the the types of fuel available in the station
+    // radius 
     let fuelType: String = 1.to_string();
     let priceOrder: String = "asc".to_string();
-    let payload = json_to_pass::new(points,fuelType, priceOrder);
+    let radius: String = distance.to_string();
+    let payload = json_to_pass::new(points,fuelType, priceOrder, radius);
     let res = client
         .post(REQUEST_URL)
         .headers(headers)
@@ -65,7 +71,7 @@ pub async fn request(
                 .json::<response_struct>()
                 .await
                 .expect("error in parsing");
-            return finres;
+                return finres;
         }
         Err(err) => {
             panic!("{:?}", err);
